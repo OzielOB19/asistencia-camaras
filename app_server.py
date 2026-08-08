@@ -8,6 +8,7 @@ import threading
 import time
 import uuid
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +32,102 @@ TEMP_DIR = BASE_DIR / "registro_temporal"
 BUCKET = os.getenv("SUPABASE_BUCKET", "rostros").strip()
 TABLA = os.getenv("SUPABASE_TABLE", "perfiles_sface").strip()
 
+ZONA_HORARIA = ZoneInfo("America/Mexico_City")
+
+HORARIO_ASISTENCIA = [
+    ("Hora 1", 8 * 60, 8 * 60 + 44, "08:00:00"),
+    ("Hora 2", 8 * 60 + 45, 9 * 60 + 29, "08:45:00"),
+    ("Hora 3", 9 * 60 + 30, 10 * 60 + 14, "09:30:00"),
+    # 10:15 a 10:34 = descanso, no registra asistencia
+
+    ("Hora 4", 10 * 60 + 35, 11 * 60 + 14, "10:35:00"),
+    ("Hora 5", 11 * 60 + 15, 11 * 60 + 59, "11:15:00"),
+    ("Hora 6", 12 * 60, 13 * 60 + 4, "12:00:00"),
+    ("Hora 7", 13 * 60 + 5, 13 * 60 + 49, "13:05:00"),
+    ("Hora 8", 13 * 60 + 50, 14 * 60 + 34, "13:50:00"),
+    ("Hora 9", 14 * 60 + 35, 15 * 60 + 20, "14:35:00"),
+]
+def obtener_periodo_asistencia(ahora=None):
+    if ahora is None:
+        ahora = datetime.now(ZONA_HORARIA)
+
+    minutos = ahora.hour * 60 + ahora.minute
+
+    for nombre, inicio, fin, hora_clase in HORARIO_ASISTENCIA:
+        if inicio <= minutos <= fin:
+            return {
+                "periodo": nombre,
+                "hora_clase": hora_clase,
+                "ahora": ahora,
+            }
+
+    return None
+def registrar_asistencia(nombre: str, similitud: float) -> bool:
+    periodo = obtener_periodo_asistencia()
+
+    # Fuera del horario o durante el descanso
+    if periodo is None:
+        return False
+
+    ahora = periodo["ahora"]
+    fecha = ahora.date().isoformat()
+
+    dias = [
+        "lunes",
+        "martes",
+        "miércoles",
+        "jueves",
+        "viernes",
+        "sábado",
+        "domingo",
+    ]
+
+    dia = dias[ahora.weekday()]
+    hora_deteccion = ahora.strftime("%H:%M:%S")
+
+    try:
+        existente = (
+            supabase.table("asistencias")
+            .select("id")
+            .eq("nombre", nombre)
+            .eq("fecha", fecha)
+            .eq("periodo", periodo["periodo"])
+            .limit(1)
+            .execute()
+        )
+
+        # Ya tomó asistencia en esta hora
+        if existente.data:
+            return False
+
+        fila = {
+            "nombre": nombre,
+            "fecha": fecha,
+            "dia": dia,
+            "periodo": periodo["periodo"],
+            "hora_clase": periodo["hora_clase"],
+            "hora_deteccion": hora_deteccion,
+            "similitud": float(similitud),
+            "estado": "Presente",
+        }
+
+        supabase.table("asistencias").insert(fila).execute()
+
+        print(
+            f"[ASISTENCIA] {nombre} - "
+            f"{periodo['periodo']} - {hora_deteccion}",
+            flush=True,
+        )
+
+        return True
+
+    except Exception as exc:
+        print(
+            f"[ASISTENCIA] Error: "
+            f"{type(exc).__name__}: {exc}",
+            flush=True,
+        )
+        return False
 ETAPAS = ["FRENTE", "IZQUIERDA", "DERECHA", "ARRIBA", "ABAJO"]
 FOTOS_POR_ETAPA = 10
 TOTAL_FOTOS = len(ETAPAS) * FOTOS_POR_ETAPA
@@ -706,6 +803,9 @@ def reconocer_en_frame(
         y = max(0, min(y, alto_frame - 1))
         ancho = max(1, min(ancho, ancho_frame - x))
         alto = max(1, min(alto, alto_frame - y))
+
+        if nombre != "desconocido":
+            registrar_asistencia(nombre, similitud)
 
         resultados.append(
             {
