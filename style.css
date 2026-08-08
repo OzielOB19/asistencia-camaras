@@ -387,3 +387,137 @@ ol li.completa > span {
         min-height: 300px;
     }
 }
+/* =========================
+   SECCIÓN DE ASISTENCIA
+   ========================= */
+
+.asistencia-seccion {
+    margin-top: 18px;
+}
+
+.asistencia-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.asistencia-encabezado h2 {
+    margin: 4px 0;
+}
+
+.asistencia-resumen {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.asistencia-resumen > div {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.asistencia-resumen span {
+    display: block;
+    color: #9fb0c8;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.asistencia-resumen strong {
+    font-size: 1.25rem;
+}
+
+.asistencia-vistas {
+    margin-bottom: 18px;
+}
+
+.asistencia-hora {
+    margin-bottom: 10px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.asistencia-hora summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+}
+
+.asistencia-hora summary::-webkit-details-marker {
+    display: none;
+}
+
+.asistencia-hora summary div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.asistencia-hora summary span {
+    color: #9fb0c8;
+    font-size: 0.88rem;
+}
+
+.asistencia-hora summary b {
+    color: #7ee2aa;
+}
+
+.asistencia-lista-personas {
+    padding: 0 16px 14px;
+}
+
+.asistencia-persona,
+.asistencia-persona-hora {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    margin-top: 8px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.asistencia-persona span,
+.asistencia-persona-hora span,
+.asistencia-persona-hora em {
+    color: #a9b7ca;
+}
+
+.asistencia-persona-hora em {
+    font-style: normal;
+}
+
+.asistencia-vacia {
+    padding: 12px;
+    color: #9fb0c8;
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    .asistencia-resumen {
+        grid-template-columns: 1fr;
+    }
+
+    .asistencia-encabezado {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .asistencia-persona,
+    .asistencia-persona-hora {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

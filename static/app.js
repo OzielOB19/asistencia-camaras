@@ -1180,6 +1180,220 @@ window.addEventListener(
         );
     }
 );
+const btnAsistencia = document.getElementById("btnAsistencia");
+const btnCerrarAsistencia = document.getElementById("btnCerrarAsistencia");
+const seccionAsistencia = document.getElementById("seccionAsistencia");
+
+btnAsistencia?.addEventListener("click", () => {
+    seccionAsistencia.hidden = false;
+
+    seccionAsistencia.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+});
+
+btnCerrarAsistencia?.addEventListener("click", () => {
+    seccionAsistencia.hidden = true;
+});
+const fechaAsistencia = document.getElementById("fechaAsistencia");
+const periodoActual = document.getElementById("periodoActual");
+const totalAsistenciasHoy = document.getElementById("totalAsistenciasHoy");
+const totalPersonasAsistencia = document.getElementById("totalPersonasAsistencia");
+
+const listaHorasAsistencia = document.getElementById("listaHorasAsistencia");
+const listaPersonasAsistencia = document.getElementById("listaPersonasAsistencia");
+
+const btnVistaHoras = document.getElementById("btnVistaHoras");
+const btnVistaPersonas = document.getElementById("btnVistaPersonas");
+
+const vistaHorasAsistencia = document.getElementById("vistaHorasAsistencia");
+const vistaPersonasAsistencia = document.getElementById("vistaPersonasAsistencia");
+
+
+function escaparHTML(valor) {
+    return String(valor ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+async function cargarAsistencias() {
+    listaHorasAsistencia.textContent = "Cargando...";
+    listaPersonasAsistencia.textContent = "Cargando...";
+
+    try {
+        const respuesta = await fetch("/api/asistencias/hoy", {
+            cache: "no-store"
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok || !datos.ok) {
+            throw new Error(
+                datos.mensaje || "No se pudieron cargar las asistencias"
+            );
+        }
+
+        fechaAsistencia.textContent =
+            `${datos.dia} · ${datos.fecha}`;
+
+        periodoActual.textContent =
+            datos.periodo_actual;
+
+        totalAsistenciasHoy.textContent =
+            datos.total_asistencias;
+
+        totalPersonasAsistencia.textContent =
+            datos.total_personas;
+
+
+        // =========================
+        // VISTA POR HORAS
+        // =========================
+
+        listaHorasAsistencia.innerHTML = datos.horas.map(hora => {
+
+            const personas = hora.personas || [];
+
+            const lista = personas.length
+                ? personas.map(persona => `
+                    <div class="asistencia-persona">
+                        <strong>
+                            ${escaparHTML(persona.nombre)}
+                        </strong>
+
+                        <span>
+                            ${escaparHTML(persona.hora_deteccion)}
+                        </span>
+                    </div>
+                `).join("")
+                : `
+                    <div class="asistencia-vacia">
+                        Sin registros
+                    </div>
+                `;
+
+            return `
+                <details class="asistencia-hora">
+                    <summary>
+                        <div>
+                            <strong>
+                                ${escaparHTML(hora.periodo)}
+                            </strong>
+
+                            <span>
+                                ${escaparHTML(hora.hora_clase)}
+                            </span>
+                        </div>
+
+                        <b>
+                            ${hora.asistieron}
+                            ${hora.asistieron === 1
+                                ? "persona"
+                                : "personas"}
+                        </b>
+                    </summary>
+
+                    <div class="asistencia-lista-personas">
+                        ${lista}
+                    </div>
+                </details>
+            `;
+        }).join("");
+
+
+        // =========================
+        // VISTA POR PERSONA
+        // =========================
+
+        const personas = Object.entries(
+            datos.personas || {}
+        );
+
+        if (!personas.length) {
+            listaPersonasAsistencia.innerHTML =
+                `<div class="asistencia-vacia">
+                    No hay asistencias registradas hoy.
+                </div>`;
+
+            return;
+        }
+
+        listaPersonasAsistencia.innerHTML =
+            personas.map(([nombre, registros]) => {
+
+                const horas = registros.map(registro => `
+                    <div class="asistencia-persona-hora">
+                        <span>
+                            ${escaparHTML(registro.periodo)}
+                        </span>
+
+                        <strong>
+                            ${escaparHTML(registro.hora_deteccion)}
+                        </strong>
+
+                        <em>
+                            ${escaparHTML(registro.estado)}
+                        </em>
+                    </div>
+                `).join("");
+
+                return `
+                    <details class="asistencia-hora">
+                        <summary>
+                            <strong>
+                                ${escaparHTML(nombre)}
+                            </strong>
+
+                            <b>
+                                ${registros.length} / 9 horas
+                            </b>
+                        </summary>
+
+                        <div class="asistencia-lista-personas">
+                            ${horas}
+                        </div>
+                    </details>
+                `;
+            }).join("");
+
+    } catch (error) {
+        console.error(error);
+
+        listaHorasAsistencia.textContent =
+            "Error al cargar las asistencias.";
+
+        listaPersonasAsistencia.textContent =
+            "Error al cargar las asistencias.";
+    }
+}
+
+
+btnAsistencia?.addEventListener("click", () => {
+    cargarAsistencias();
+});
+
+
+btnVistaHoras?.addEventListener("click", () => {
+    vistaHorasAsistencia.hidden = false;
+    vistaPersonasAsistencia.hidden = true;
+
+    btnVistaHoras.classList.add("principal");
+    btnVistaPersonas.classList.remove("principal");
+});
+
+
+btnVistaPersonas?.addEventListener("click", () => {
+    vistaHorasAsistencia.hidden = true;
+    vistaPersonasAsistencia.hidden = false;
+
+    btnVistaPersonas.classList.add("principal");
+    btnVistaHoras.classList.remove("principal");
+});
 
 actualizarRegistro();
 comprobarServidor();

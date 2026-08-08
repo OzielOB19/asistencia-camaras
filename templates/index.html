@@ -10,7 +10,6 @@
 <main class="contenedor">
     <header class="tarjeta encabezado">
         <div>
-            <p class="superior">Ubuntu Server + Supabase</p>
             <h1>Asistencia facial</h1>
             <p>Registro y reconocimiento de varias personas desde el navegador.</p>
         </div>
@@ -48,6 +47,9 @@
                 <button id="btnEtapa" class="principal" disabled>
                     Iniciar registro
                 </button>
+                <button id="btnAsistencia" class="secundario">
+    Ver asistencia
+</button>
             </div>
 
             <p id="mensaje" class="mensaje">
@@ -108,6 +110,65 @@
             </ol>
         </aside>
     </section>
+    <section id="seccionAsistencia" class="tarjeta asistencia-seccion" hidden>
+
+    <div class="asistencia-encabezado">
+        <div>
+            <p class="superior">Control por periodos</p>
+            <h2>Asistencia de hoy</h2>
+            <p id="fechaAsistencia">Cargando fecha...</p>
+        </div>
+
+        <button id="btnCerrarAsistencia" class="secundario">
+            Cerrar
+        </button>
+    </div>
+
+    <div class="resumen asistencia-resumen">
+        <div>
+            <span>Periodo actual</span>
+            <strong id="periodoActual">Fuera de horario</strong>
+        </div>
+
+        <div>
+            <span>Asistencias hoy</span>
+            <strong id="totalAsistenciasHoy">0</strong>
+        </div>
+
+        <div>
+            <span>Personas</span>
+            <strong id="totalPersonasAsistencia">0</strong>
+        </div>
+    </div>
+
+    <div class="botones asistencia-vistas">
+        <button id="btnVistaHoras" class="principal">
+            Por horas
+        </button>
+
+        <button id="btnVistaPersonas" class="secundario">
+            Por persona
+        </button>
+    </div>
+
+    <div id="vistaHorasAsistencia">
+        <h3>Asistencia por hora</h3>
+
+        <div id="listaHorasAsistencia">
+            Cargando asistencias...
+        </div>
+    </div>
+
+    <div id="vistaPersonasAsistencia" hidden>
+        <h3>Asistencia por persona</h3>
+
+        <div id="listaPersonasAsistencia">
+            Cargando personas...
+        </div>
+    </div>
+
+</section>
+
 </main>
 
 <script>

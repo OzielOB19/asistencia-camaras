@@ -38,6 +38,7 @@ HORARIO_ASISTENCIA = [
     ("Hora 1", 8 * 60, 8 * 60 + 44, "08:00:00"),
     ("Hora 2", 8 * 60 + 45, 9 * 60 + 29, "08:45:00"),
     ("Hora 3", 9 * 60 + 30, 10 * 60 + 14, "09:30:00"),
+
     # 10:15 a 10:34 = descanso, no registra asistencia
 
     ("Hora 4", 10 * 60 + 35, 11 * 60 + 14, "10:35:00"),
@@ -889,6 +890,132 @@ def sincronizar_supabase(
 
     return ruta_npz
 
+@app.get("/api/asistencias/hoy")
+def api_asistencias_hoy():
+    ahora = datetime.now(ZONA_HORARIA)
+    fecha = ahora.date().isoformat()
+
+    dias = [
+        "lunes",
+        "martes",
+        "miércoles",
+        "jueves",
+        "viernes",
+        "sábado",
+        "domingo",
+    ]
+
+    periodo_actual = obtener_periodo_asistencia(ahora)
+
+    try:
+        respuesta = (
+            supabase.table("asistencias")
+            .select(
+                "nombre,fecha,dia,periodo,"
+                "hora_clase,hora_deteccion,"
+                "similitud,estado"
+            )
+            .eq("fecha", fecha)
+            .order("hora_clase")
+            .execute()
+        )
+
+        registros = respuesta.data or []
+
+        horas = []
+
+        for (
+            nombre_periodo,
+            inicio,
+            fin,
+            hora_clase,
+        ) in HORARIO_ASISTENCIA:
+
+            registros_hora = [
+                fila
+                for fila in registros
+                if fila.get("periodo") == nombre_periodo
+            ]
+
+            personas_hora = sorted(
+                registros_hora,
+                key=lambda fila: fila.get(
+                    "hora_deteccion",
+                    "",
+                ),
+            )
+
+            horas.append(
+                {
+                    "periodo": nombre_periodo,
+                    "hora_clase": hora_clase[:5],
+                    "asistieron": len(
+                        {
+                            fila.get("nombre")
+                            for fila in registros_hora
+                            if fila.get("nombre")
+                        }
+                    ),
+                    "personas": personas_hora,
+                }
+            )
+
+        personas = {}
+
+        for fila in registros:
+            nombre = fila.get("nombre")
+
+            if not nombre:
+                continue
+
+            if nombre not in personas:
+                personas[nombre] = []
+
+            personas[nombre].append(
+                {
+                    "periodo": fila.get("periodo"),
+                    "hora_clase": fila.get(
+                        "hora_clase"
+                    ),
+                    "hora_deteccion": fila.get(
+                        "hora_deteccion"
+                    ),
+                    "estado": fila.get(
+                        "estado",
+                        "Presente",
+                    ),
+                    "similitud": fila.get(
+                        "similitud"
+                    ),
+                }
+            )
+
+        return {
+            "ok": True,
+            "fecha": fecha,
+            "dia": dias[ahora.weekday()],
+            "periodo_actual": (
+                periodo_actual["periodo"]
+                if periodo_actual
+                else "Fuera de horario"
+            ),
+            "total_asistencias": len(registros),
+            "total_personas": len(personas),
+            "horas": horas,
+            "personas": personas,
+        }
+
+    except Exception as exc:
+        print(
+            f"[ASISTENCIA API] "
+            f"{type(exc).__name__}: {exc}",
+            flush=True,
+        )
+
+        return {
+            "ok": False,
+            "mensaje": str(exc),
+        }, 500
 
 @app.get("/")
 def index():
