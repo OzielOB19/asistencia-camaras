@@ -468,7 +468,76 @@ def firma_galeria() -> tuple[tuple[str, int, int], ...]:
     return tuple(firma)
 
 
+def descargar_galeria_desde_supabase() -> int:
+    descargados = 0
+
+    try:
+        respuesta = (
+            supabase.table(TABLA)
+            .select("nombre,sesion,ruta_embeddings")
+            .execute()
+        )
+
+        for fila in respuesta.data or []:
+            ruta_remota = str(
+                fila.get("ruta_embeddings") or ""
+            ).strip()
+
+            if not ruta_remota:
+                continue
+
+            partes = Path(ruta_remota).parts
+
+            if len(partes) < 4 or partes[0] != "sface":
+                print(
+                    f"[SUPABASE] Ruta ignorada: {ruta_remota}",
+                    flush=True,
+                )
+                continue
+
+            nombre_dir = Path(partes[1]).name
+            sesion_dir = Path(partes[2]).name
+
+            destino = (
+                DATOS_DIR
+                / nombre_dir
+                / sesion_dir
+                / "embeddings.npz"
+            )
+
+            destino.parent.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+
+            contenido = (
+                supabase.storage
+                .from_(BUCKET)
+                .download(ruta_remota)
+            )
+
+            destino.write_bytes(contenido)
+            descargados += 1
+
+        print(
+            f"[SUPABASE] {descargados} embeddings descargados",
+            flush=True,
+        )
+
+    except Exception as exc:
+        print(
+            f"[SUPABASE] Error descargando galería: "
+            f"{type(exc).__name__}: {exc}",
+            flush=True,
+        )
+
+    return descargados
+
+
 def cargar_galeria(forzar: bool = False) -> list[dict[str, Any]]:
+    if not any(DATOS_DIR.glob("*/*/embeddings.npz")):
+        descargar_galeria_desde_supabase()
+
     firma = firma_galeria()
 
     with galeria_lock:
