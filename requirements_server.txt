@@ -1,0 +1,6 @@
+numpy<2
+opencv-contrib-python-headless==4.10.0.84
+Flask
+gunicorn
+python-dotenv
+supabase

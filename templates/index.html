@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Asistencia facial</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main class="contenedor">
+    <header class="tarjeta encabezado">
+        <div>
+            <p class="superior">Ubuntu Server + Supabase</p>
+            <h1>Asistencia facial</h1>
+            <p>Registro y reconocimiento de varias personas desde el navegador.</p>
+        </div>
+        <div class="estado-grupo">
+            <span id="estadoServidor" class="estado espera">
+                Comprobando servidor…
+            </span>
+            <span id="estadoPerfiles" class="estado neutro">
+                0 personas cargadas
+            </span>
+        </div>
+    </header>
+
+    <section class="columnas">
+        <article class="tarjeta bloque-camara">
+            <div class="visor">
+                <video id="video" autoplay playsinline muted></video>
+                <canvas id="overlay"></canvas>
+                <canvas id="canvasCaptura" hidden></canvas>
+
+                <div id="instruccion" class="instruccion">
+                    Enciende la cámara
+                </div>
+            </div>
+
+            <div class="botones">
+                <button id="btnCamara" class="secundario">
+                    Encender cámara
+                </button>
+
+                <button id="btnReconocer" class="reconocer" disabled>
+                    Iniciar reconocimiento
+                </button>
+
+                <button id="btnEtapa" class="principal" disabled>
+                    Iniciar registro
+                </button>
+            </div>
+
+            <p id="mensaje" class="mensaje">
+                La cámara se procesa en el Ubuntu Server.
+            </p>
+
+            <div id="resultadoReconocimiento" class="resultado">
+                Aún no hay reconocimiento activo.
+            </div>
+        </article>
+
+        <aside class="tarjeta panel">
+            <h2>Nuevo registro</h2>
+
+            <label for="nombre">Nombre de la persona</label>
+            <input
+                id="nombre"
+                type="text"
+                maxlength="80"
+                placeholder="Ejemplo: Oziel"
+            >
+
+            <div class="resumen">
+                <div>
+                    <span>Etapa</span>
+                    <strong id="etapaActual">Sin iniciar</strong>
+                </div>
+                <div>
+                    <span>Capturas</span>
+                    <strong id="contador">
+                        0 / {{ fotos_por_etapa }}
+                    </strong>
+                </div>
+                <div>
+                    <span>Total</span>
+                    <strong id="total">
+                        0 / {{ total_fotos }}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="barra">
+                <div id="progreso" class="progreso"></div>
+            </div>
+
+            <ol id="listaEtapas">
+                {% for etapa in etapas %}
+                <li data-etapa="{{ etapa }}">
+                    <span>{{ loop.index }}</span>
+                    <div>
+                        <strong>{{ etapa }}</strong>
+                        <small>
+                            0 / {{ fotos_por_etapa }}
+                        </small>
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+        </aside>
+    </section>
+</main>
+
+<script>
+window.REGISTRO = {
+    etapas: {{ etapas | tojson }},
+    fotosPorEtapa: {{ fotos_por_etapa }},
+    totalFotos: {{ total_fotos }}
+};
+</script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
