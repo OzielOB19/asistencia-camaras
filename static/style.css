@@ -401,3 +401,567 @@ video {
     backface-visibility: hidden;
     will-change: contents;
 }
+/* =========================================================
+   ASISTENCIA - VENTANA EMERGENTE TIPO CALENDARIO
+   Paleta institucional azul marino
+   ========================================================= */
+
+.asistencia-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(3, 9, 20, 0.82);
+    backdrop-filter: blur(10px);
+}
+
+.asistencia-modal[hidden] {
+    display: none !important;
+}
+
+.asistencia-modal-contenido {
+    width: min(1350px, 96vw);
+    max-height: 94vh;
+    overflow-y: auto;
+
+    padding: 28px;
+
+    background: #0b1424;
+
+    border: 1px solid #2b466d;
+    border-radius: 22px;
+
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.55);
+}
+
+
+/* =========================
+   CABECERA
+   ========================= */
+
+.asistencia-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+
+    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.asistencia-encabezado h2 {
+    margin: 4px 0;
+
+    color: #f1f5f9;
+
+    font-size: clamp(1.8rem, 3vw, 2.7rem);
+}
+
+.asistencia-encabezado .superior,
+.titulo-calendario .superior {
+    margin: 0;
+
+    color: #7ea6ff;
+
+    font-size: .76rem;
+    font-weight: 900;
+
+    text-transform: uppercase;
+    letter-spacing: .09em;
+}
+
+.asistencia-encabezado p {
+    color: #94a3b8;
+}
+
+
+/* =========================
+   RESUMEN SUPERIOR
+   ========================= */
+
+.asistencia-resumen {
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(180px, 1fr));
+
+    gap: 14px;
+
+    margin: 20px 0;
+}
+
+.asistencia-resumen > div {
+    display: block;
+
+    padding: 17px;
+
+    background: #151f32;
+
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 14px;
+}
+
+.asistencia-resumen span {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #94a3b8;
+
+    font-size: .78rem;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.asistencia-resumen strong {
+    color: #f1f5f9;
+    font-size: 1.25rem;
+}
+
+
+/* =========================
+   BOTONES DE VISTAS
+   ========================= */
+
+.asistencia-vistas {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(160px, 280px));
+
+    gap: 10px;
+
+    margin: 0 0 24px;
+}
+
+.asistencia-vistas button {
+    width: 100%;
+}
+
+
+/* =========================
+   TITULO CALENDARIO
+   ========================= */
+
+.titulo-calendario {
+    margin-bottom: 15px;
+}
+
+.titulo-calendario h3 {
+    margin: 4px 0 0;
+
+    color: #f1f5f9;
+
+    font-size: 1.4rem;
+}
+
+
+/* =========================
+   CUADRICULA
+   ========================= */
+
+.calendario-asistencia {
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+.calendario-fila {
+    display: grid;
+    gap: 15px;
+}
+
+.calendario-fila-3 {
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+}
+
+
+/* =========================
+   CADA PERIODO
+   ========================= */
+
+.calendario-hora {
+    min-height: 235px;
+
+    overflow: hidden;
+
+    background: #151f32;
+
+    border: 1px solid #2b466d;
+    border-radius: 16px;
+
+    transition:
+        transform .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease;
+}
+
+.calendario-hora:hover {
+    transform: translateY(-3px);
+
+    border-color: #3978ff;
+
+    box-shadow:
+        0 14px 32px rgba(0, 0, 0, .28);
+}
+
+
+/* HORA ACTUAL */
+
+.calendario-hora-actual {
+    border: 2px solid #3978ff;
+
+    box-shadow:
+        0 0 0 4px rgba(57, 120, 255, .12);
+}
+
+.calendario-hora-actual::before {
+    content: "PERIODO ACTUAL";
+
+    display: block;
+
+    padding: 6px 15px;
+
+    color: #dbeafe;
+    background: #315e9b;
+
+    font-size: .68rem;
+    font-weight: 900;
+
+    letter-spacing: .08em;
+}
+
+
+/* =========================
+   ENCABEZADO DE CADA HORA
+   ========================= */
+
+.calendario-hora-cabecera {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 12px;
+
+    padding: 17px;
+
+    background: #1b2b46;
+
+    border-bottom:
+        1px solid rgba(148, 163, 184, .14);
+}
+
+.calendario-periodo {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #f1f5f9;
+
+    font-size: 1.05rem;
+    font-weight: 900;
+}
+
+.calendario-hora-inicio {
+    color: #94a3b8;
+
+    font-size: 1.25rem;
+}
+
+.calendario-contador {
+    padding: 8px 11px;
+
+    color: #a7f3d0;
+    background: rgba(62, 142, 109, .16);
+
+    border: 1px solid rgba(62, 142, 109, .30);
+    border-radius: 999px;
+
+    font-size: .76rem;
+    font-weight: 900;
+
+    white-space: nowrap;
+}
+
+
+/* =========================
+   LISTA DE PERSONAS
+   ========================= */
+
+.calendario-hora-contenido {
+    max-height: 260px;
+
+    overflow-y: auto;
+
+    padding: 12px;
+}
+
+.calendario-persona {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px 10px;
+    margin-bottom: 7px;
+
+    background: #122038;
+
+    border: 1px solid rgba(148, 163, 184, .08);
+    border-radius: 10px;
+}
+
+.calendario-persona > div {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+}
+
+.calendario-persona strong {
+    color: #e2e8f0;
+    font-size: .88rem;
+}
+
+.calendario-persona time {
+    color: #94a3b8;
+    font-size: .82rem;
+}
+
+
+/* INICIAL DE PERSONA */
+
+.calendario-avatar {
+    display: grid;
+    place-items: center;
+
+    width: 30px;
+    height: 30px;
+
+    flex: 0 0 30px;
+
+    color: white;
+    background: #315e9b;
+
+    border-radius: 50%;
+
+    font-size: .78rem;
+    font-weight: 900;
+}
+
+
+/* VACIO */
+
+.calendario-sin-registros {
+    display: grid;
+    place-items: center;
+
+    min-height: 125px;
+
+    color: #71839e;
+
+    font-size: .88rem;
+}
+
+
+/* =========================
+   DESCANSO
+   ========================= */
+
+.calendario-descanso {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 14px;
+
+    min-height: 72px;
+
+    padding: 14px 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(49, 94, 155, .06),
+            rgba(49, 94, 155, .20),
+            rgba(49, 94, 155, .06)
+        );
+
+    border: 1px dashed #315e9b;
+    border-radius: 14px;
+}
+
+.calendario-descanso-icono {
+    display: grid;
+    place-items: center;
+
+    width: 44px;
+    height: 44px;
+
+    background: #1b2b46;
+
+    border-radius: 50%;
+
+    font-size: 1.25rem;
+}
+
+.calendario-descanso strong {
+    display: block;
+
+    color: #f1f5f9;
+
+    font-size: .9rem;
+    letter-spacing: .08em;
+}
+
+.calendario-descanso span {
+    color: #94a3b8;
+    font-size: .84rem;
+}
+
+
+/* =========================
+   VISTA POR PERSONA
+   ========================= */
+
+#listaPersonasAsistencia {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(220px, 1fr));
+
+    gap: 12px;
+}
+
+.asistencia-hora {
+    overflow: hidden;
+
+    background: #151f32;
+
+    border: 1px solid #2b466d;
+    border-radius: 14px;
+}
+
+.asistencia-hora summary {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 15px;
+
+    cursor: pointer;
+}
+
+.asistencia-lista-personas {
+    padding: 0 15px 15px;
+}
+
+.asistencia-persona-hora {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 10px;
+
+    margin-top: 7px;
+
+    background: #122038;
+
+    border-radius: 9px;
+}
+
+
+/* =========================
+   SCROLL
+   ========================= */
+
+.asistencia-modal-contenido::-webkit-scrollbar,
+.calendario-hora-contenido::-webkit-scrollbar {
+    width: 7px;
+}
+
+.asistencia-modal-contenido::-webkit-scrollbar-thumb,
+.calendario-hora-contenido::-webkit-scrollbar-thumb {
+    background: #315e9b;
+    border-radius: 999px;
+}
+
+
+/* =========================
+   TABLET
+   ========================= */
+
+@media (max-width: 950px) {
+
+    .calendario-fila-3 {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    #listaPersonasAsistencia {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* =========================
+   CELULAR
+   ========================= */
+
+@media (max-width: 650px) {
+
+    .asistencia-modal {
+        padding: 7px;
+    }
+
+    .asistencia-modal-contenido {
+        width: 100%;
+        max-height: 97vh;
+
+        padding: 16px;
+
+        border-radius: 15px;
+    }
+
+    .asistencia-encabezado {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .asistencia-resumen {
+        grid-template-columns: 1fr;
+    }
+
+    .asistencia-vistas {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .calendario-fila-3,
+    #listaPersonasAsistencia {
+        grid-template-columns: 1fr;
+    }
+}
