@@ -1,4 +1,8 @@
-const cfg = window.REGISTRO;
+const configRegistro = document.getElementById("configRegistro");
+
+const cfg = JSON.parse(
+    configRegistro?.textContent || "{}"
+);
 
 const video = document.getElementById("video");
 const canvasCaptura = document.getElementById("canvasCaptura");
@@ -1255,56 +1259,119 @@ async function cargarAsistencias() {
         // VISTA POR HORAS
         // =========================
 
-        listaHorasAsistencia.innerHTML = datos.horas.map(hora => {
+       // =========================
+// VISTA POR HORAS - CALENDARIO
+// =========================
 
-            const personas = hora.personas || [];
+const crearTarjetaHora = (hora) => {
+    const personas = hora.personas || [];
 
-            const lista = personas.length
-                ? personas.map(persona => `
-                    <div class="asistencia-persona">
-                        <strong>
-                            ${escaparHTML(persona.nombre)}
-                        </strong>
+    const esActual =
+        datos.periodo_actual === hora.periodo;
 
-                        <span>
-                            ${escaparHTML(persona.hora_deteccion)}
-                        </span>
-                    </div>
-                `).join("")
-                : `
-                    <div class="asistencia-vacia">
-                        Sin registros
-                    </div>
-                `;
+    const lista = personas.length
+        ? personas.map(persona => `
+            <div class="calendario-persona">
+                <div>
+                    <span class="calendario-avatar">
+                        ${escaparHTML(
+                            String(persona.nombre || "?")
+                                .charAt(0)
+                                .toUpperCase()
+                        )}
+                    </span>
 
-            return `
-                <details class="asistencia-hora">
-                    <summary>
-                        <div>
-                            <strong>
-                                ${escaparHTML(hora.periodo)}
-                            </strong>
+                    <strong>
+                        ${escaparHTML(persona.nombre)}
+                    </strong>
+                </div>
 
-                            <span>
-                                ${escaparHTML(hora.hora_clase)}
-                            </span>
-                        </div>
+                <time>
+                    ${escaparHTML(
+                        String(
+                            persona.hora_deteccion || ""
+                        ).slice(0, 5)
+                    )}
+                </time>
+            </div>
+        `).join("")
+        : `
+            <div class="calendario-sin-registros">
+                Sin asistencias
+            </div>
+        `;
 
-                        <b>
-                            ${hora.asistieron}
-                            ${hora.asistieron === 1
-                                ? "persona"
-                                : "personas"}
-                        </b>
-                    </summary>
+    return `
+        <article
+            class="calendario-hora
+            ${esActual ? "calendario-hora-actual" : ""}"
+        >
+            <div class="calendario-hora-cabecera">
+                <div>
+                    <span class="calendario-periodo">
+                        ${escaparHTML(hora.periodo)}
+                    </span>
 
-                    <div class="asistencia-lista-personas">
-                        ${lista}
-                    </div>
-                </details>
-            `;
-        }).join("");
+                    <strong class="calendario-hora-inicio">
+                        ${escaparHTML(hora.hora_clase)}
+                    </strong>
+                </div>
 
+                <span class="calendario-contador">
+                    ${hora.asistieron}
+                    ${hora.asistieron === 1
+                        ? "persona"
+                        : "personas"}
+                </span>
+            </div>
+
+            <div class="calendario-hora-contenido">
+                ${lista}
+            </div>
+        </article>
+    `;
+};
+
+
+const horas = datos.horas || [];
+
+const primeraParte = horas.slice(0, 3);
+const segundaParte = horas.slice(3);
+
+listaHorasAsistencia.innerHTML = `
+    <div class="calendario-asistencia">
+
+        <div class="calendario-fila calendario-fila-3">
+            ${primeraParte.map(crearTarjetaHora).join("")}
+        </div>
+
+        <div class="calendario-descanso">
+            <div class="calendario-descanso-icono">
+                ☕
+            </div>
+
+            <div>
+                <strong>DESCANSO</strong>
+                <span>10:15 AM — 10:34 AM</span>
+            </div>
+        </div>
+
+        <div class="calendario-fila calendario-fila-3">
+            ${segundaParte
+                .slice(0, 3)
+                .map(crearTarjetaHora)
+                .join("")}
+        </div>
+
+        <div class="calendario-fila calendario-fila-3">
+            ${segundaParte
+                .slice(3, 6)
+                .map(crearTarjetaHora)
+                .join("")}
+        </div>
+
+    </div>
+`;  
 
         // =========================
         // VISTA POR PERSONA

@@ -3,68 +3,153 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Asistencia facial</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
+
 <body>
+
 <main class="contenedor">
+
+    <!-- =========================
+         ENCABEZADO
+         ========================= -->
     <header class="tarjeta encabezado">
+
         <div>
             <h1>Asistencia facial</h1>
-            <p>Registro y reconocimiento de varias personas desde el navegador.</p>
+
+            <p>
+                Registro y reconocimiento de varias personas
+                desde el navegador.
+            </p>
         </div>
+
         <div class="estado-grupo">
-            <span id="estadoServidor" class="estado espera">
+
+            <span
+                id="estadoServidor"
+                class="estado espera"
+            >
                 Comprobando servidor…
             </span>
-            <span id="estadoPerfiles" class="estado neutro">
+
+            <span
+                id="estadoPerfiles"
+                class="estado neutro"
+            >
                 0 personas cargadas
             </span>
+
         </div>
+
     </header>
 
-    <section class="columnas">
-        <article class="tarjeta bloque-camara">
-            <div class="visor">
-                <video id="video" autoplay playsinline muted></video>
-                <canvas id="overlay"></canvas>
-                <canvas id="canvasCaptura" hidden></canvas>
 
-                <div id="instruccion" class="instruccion">
+    <!-- =========================
+         CÁMARA + REGISTRO
+         ========================= -->
+    <section class="columnas">
+
+        <!-- CÁMARA -->
+        <article class="tarjeta bloque-camara">
+
+            <div class="visor">
+
+                <video
+                    id="video"
+                    autoplay
+                    playsinline
+                    muted
+                ></video>
+
+                <canvas id="overlay"></canvas>
+
+                <canvas
+                    id="canvasCaptura"
+                    hidden
+                ></canvas>
+
+                <div
+                    id="instruccion"
+                    class="instruccion"
+                >
                     Enciende la cámara
                 </div>
+
             </div>
 
+
+            <!-- BOTONES -->
             <div class="botones">
-                <button id="btnCamara" class="secundario">
+
+                <button
+                    id="btnCamara"
+                    class="secundario"
+                >
                     Encender cámara
                 </button>
 
-                <button id="btnReconocer" class="reconocer" disabled>
+                <button
+                    id="btnReconocer"
+                    class="reconocer"
+                    disabled
+                >
                     Iniciar reconocimiento
                 </button>
 
-                <button id="btnEtapa" class="principal" disabled>
+                <button
+                    id="btnEtapa"
+                    class="principal"
+                    disabled
+                >
                     Iniciar registro
                 </button>
-                <button id="btnAsistencia" class="secundario">
-    Ver asistencia
-</button>
+
+                <button
+                    id="btnAsistencia"
+                    class="secundario"
+                >
+                    Ver asistencia
+                </button>
+
             </div>
 
-            <p id="mensaje" class="mensaje">
-                La cámara se procesa en el Ubuntu Server.
+
+            <p
+                id="mensaje"
+                class="mensaje"
+            >
+                La cámara se procesa en el servidor.
             </p>
 
-            <div id="resultadoReconocimiento" class="resultado">
+
+            <div
+                id="resultadoReconocimiento"
+                class="resultado"
+            >
                 Aún no hay reconocimiento activo.
             </div>
+
         </article>
 
+
+        <!-- =========================
+             PANEL DE REGISTRO
+             ========================= -->
         <aside class="tarjeta panel">
+
             <h2>Nuevo registro</h2>
 
-            <label for="nombre">Nombre de la persona</label>
+            <label for="nombre">
+                Nombre de la persona
+            </label>
+
             <input
                 id="nombre"
                 type="text"
@@ -72,112 +157,266 @@
                 placeholder="Ejemplo: Oziel"
             >
 
+
             <div class="resumen">
+
                 <div>
                     <span>Etapa</span>
-                    <strong id="etapaActual">Sin iniciar</strong>
+
+                    <strong id="etapaActual">
+                        Sin iniciar
+                    </strong>
                 </div>
+
                 <div>
                     <span>Capturas</span>
+
                     <strong id="contador">
                         0 / {{ fotos_por_etapa }}
                     </strong>
                 </div>
+
                 <div>
                     <span>Total</span>
+
                     <strong id="total">
                         0 / {{ total_fotos }}
                     </strong>
                 </div>
+
             </div>
+
 
             <div class="barra">
-                <div id="progreso" class="progreso"></div>
+                <div
+                    id="progreso"
+                    class="progreso"
+                ></div>
             </div>
 
+
             <ol id="listaEtapas">
+
                 {% for etapa in etapas %}
+
                 <li data-etapa="{{ etapa }}">
-                    <span>{{ loop.index }}</span>
+
+                    <span>
+                        {{ loop.index }}
+                    </span>
+
                     <div>
-                        <strong>{{ etapa }}</strong>
+
+                        <strong>
+                            {{ etapa }}
+                        </strong>
+
                         <small>
                             0 / {{ fotos_por_etapa }}
                         </small>
+
                     </div>
+
                 </li>
+
                 {% endfor %}
+
             </ol>
+
         </aside>
+
     </section>
-    <section id="seccionAsistencia" class="tarjeta asistencia-seccion" hidden>
 
-    <div class="asistencia-encabezado">
-        <div>
-            <p class="superior">Control por periodos</p>
-            <h2>Asistencia de hoy</h2>
-            <p id="fechaAsistencia">Cargando fecha...</p>
+</main>
+
+
+<!-- ==================================================
+     VENTANA EMERGENTE DE ASISTENCIA
+     ================================================== -->
+<section
+    id="seccionAsistencia"
+    class="asistencia-modal"
+    hidden
+>
+
+    <div class="asistencia-modal-contenido">
+
+
+        <!-- CABECERA -->
+        <div class="asistencia-encabezado">
+
+            <div>
+
+                <p class="superior">
+                    Control escolar por periodos
+                </p>
+
+                <h2>
+                    Asistencia del día
+                </h2>
+
+                <p id="fechaAsistencia">
+                    Cargando fecha...
+                </p>
+
+            </div>
+
+
+            <button
+                id="btnCerrarAsistencia"
+                class="secundario"
+            >
+                ✕ Cerrar
+            </button>
+
         </div>
 
-        <button id="btnCerrarAsistencia" class="secundario">
-            Cerrar
-        </button>
-    </div>
 
-    <div class="resumen asistencia-resumen">
-        <div>
-            <span>Periodo actual</span>
-            <strong id="periodoActual">Fuera de horario</strong>
+        <!-- RESUMEN -->
+        <div class="resumen asistencia-resumen">
+
+            <div>
+
+                <span>
+                    Periodo actual
+                </span>
+
+                <strong id="periodoActual">
+                    Fuera de horario
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Asistencias hoy
+                </span>
+
+                <strong id="totalAsistenciasHoy">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Personas
+                </span>
+
+                <strong id="totalPersonasAsistencia">
+                    0
+                </strong>
+
+            </div>
+
         </div>
 
-        <div>
-            <span>Asistencias hoy</span>
-            <strong id="totalAsistenciasHoy">0</strong>
+
+        <!-- BOTONES DE VISTA -->
+        <div class="botones asistencia-vistas">
+
+            <button
+                id="btnVistaHoras"
+                class="principal"
+            >
+                Por horas
+            </button>
+
+            <button
+                id="btnVistaPersonas"
+                class="secundario"
+            >
+                Por persona
+            </button>
+
         </div>
 
-        <div>
-            <span>Personas</span>
-            <strong id="totalPersonasAsistencia">0</strong>
+
+        <!-- =========================
+             CALENDARIO POR HORAS
+             ========================= -->
+        <div id="vistaHorasAsistencia">
+
+            <div class="titulo-calendario">
+
+                <div>
+                    <p class="superior">
+                        Registro automático
+                    </p>
+
+                    <h3>
+                        Horario de asistencia
+                    </h3>
+                </div>
+
+            </div>
+
+
+            <div id="listaHorasAsistencia">
+
+                Cargando asistencias...
+
+            </div>
+
         </div>
-    </div>
 
-    <div class="botones asistencia-vistas">
-        <button id="btnVistaHoras" class="principal">
-            Por horas
-        </button>
 
-        <button id="btnVistaPersonas" class="secundario">
-            Por persona
-        </button>
-    </div>
+        <!-- =========================
+             VISTA POR PERSONA
+             ========================= -->
+        <div
+            id="vistaPersonasAsistencia"
+            hidden
+        >
 
-    <div id="vistaHorasAsistencia">
-        <h3>Asistencia por hora</h3>
+            <div class="titulo-calendario">
 
-        <div id="listaHorasAsistencia">
-            Cargando asistencias...
+                <div>
+                    <p class="superior">
+                        Historial individual
+                    </p>
+
+                    <h3>
+                        Asistencia por persona
+                    </h3>
+                </div>
+
+            </div>
+
+
+            <div id="listaPersonasAsistencia">
+
+                Cargando personas...
+
+            </div>
+
         </div>
-    </div>
 
-    <div id="vistaPersonasAsistencia" hidden>
-        <h3>Asistencia por persona</h3>
 
-        <div id="listaPersonasAsistencia">
-            Cargando personas...
-        </div>
     </div>
 
 </section>
 
-</main>
 
-<script>
-window.REGISTRO = {
-    etapas: {{ etapas | tojson }},
-    fotosPorEtapa: {{ fotos_por_etapa }},
-    totalFotos: {{ total_fotos }}
-};
+<!-- =========================
+     DATOS DE FLASK
+     ========================= -->
+<script id="configRegistro" type="application/json">
+{
+    "etapas": {{ etapas | tojson }},
+    "fotosPorEtapa": {{ fotos_por_etapa }},
+    "totalFotos": {{ total_fotos }}
+}
 </script>
-<script src="{{ url_for('static', filename='app.js') }}"></script>
+
+<!-- JAVASCRIPT PRINCIPAL -->
+<script
+    src="{{ url_for('static', filename='app.js') }}"
+></script>
+
 </body>
 </html>
